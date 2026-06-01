@@ -113,6 +113,18 @@ export const QRCameraScanner: React.FC<QRCameraScannerProps> = ({
     }
   };
 
+  // Automatically trigger camera initialization on mount/mode activations
+  useEffect(() => {
+    if (scanMode === 'camera') {
+      initCameraScanner();
+    } else {
+      stopCameraScanner();
+    }
+    return () => {
+      stopCameraScanner();
+    };
+  }, [scanMode]);
+
   // Handle active camera scanning instantiation
   useEffect(() => {
     if (scanMode !== 'camera') {
@@ -124,12 +136,22 @@ export const QRCameraScanner: React.FC<QRCameraScannerProps> = ({
       return;
     }
 
+    let isMounted = true;
     const startScanner = async () => {
       try {
-        if (!qrReaderRef.current) return;
+        const element = document.getElementById('qr-camera-element');
+        if (!element) {
+          // Retry in a moment if React has not finished rendering the element
+          if (isMounted) {
+            setTimeout(startScanner, 100);
+          }
+          return;
+        }
         
         // Stop any old scanner first
         await stopCameraScanner();
+
+        if (!isMounted) return;
 
         const html5QrCode = new Html5Qrcode('qr-camera-element');
         html5QrCodeRef.current = html5QrCode;
@@ -158,13 +180,16 @@ export const QRCameraScanner: React.FC<QRCameraScannerProps> = ({
         );
       } catch (err: any) {
         console.error('Failed to start camera scan stream:', err);
-        setScannerError(`Stream start failed: ${err.message || 'Camera is already in use'}`);
+        if (isMounted) {
+          setScannerError(`Stream start failed: ${err.message || 'Camera is already in use'}`);
+        }
       }
     };
 
     startScanner();
 
     return () => {
+      isMounted = false;
       stopCameraScanner();
     };
   }, [scanMode, cameraPermission, selectedCameraId]);
