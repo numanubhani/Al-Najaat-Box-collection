@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Hide scrollbars globally but allow scrolling */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Enable selector-based dark mode manually in Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
+/* ==========================================
+   OLED BLACK MODE INTEGRATION
+   Forces background to #000000 and text to #ffffff
+   ========================================== */
+
+/* Redefine Tailwind v4 Theme Variables under .dark manually for absolute safety */
+.dark {
+  --color-white: #000000 !important;
+  --color-slate-50: #000000 !important;
+  --color-zinc-50: #000000 !important;
+  --color-slate-100: #000000 !important;
+  --color-zinc-100: #000000 !important;
+  
+  /* Borders and Dividers */
+  --color-slate-200: #1a1a1a !important;
+  --color-zinc-200: #1a1a1a !important;
+  --color-slate-250\/65: rgba(39, 39, 42, 0.45) !important;
+  --color-zinc-250: #1a1a1a !important;
+  --color-slate-300\/40: rgba(39, 39, 42, 0.3) !important;
+  --color-slate-100\/80: #000000 !important;
+
+  /* Accent Opacity Blocks */
+  --color-sky-50: #0c1524 !important;
+  --color-sky-100: #0e1e38 !important;
+  --color-emerald-50: #071c14 !important;
+  --color-emerald-100: #0a291d !important;
+
+  /* Typography color scaling */
+  --color-slate-900: #ffffff !important;
+  --color-zinc-900: #ffffff !important;
+  --color-slate-800: #f4f4f5 !important;
+  --color-zinc-800: #f4f4f5 !important;
+  --color-slate-700: #e4e4e7 !important;
+  --color-zinc-700: #e4e4e7 !important;
+  --color-slate-600: #d4d4d8 !important;
+  --color-zinc-600: #d4d4d8 !important;
+  --color-slate-500: #a1a1aa !important;
+  --color-zinc-500: #a1a1aa !important;
+  --color-slate-400: #71717a !important;
+  --color-zinc-400: #71717a !important;
+}
+
+/* Base Body and Content Overrides */
+.dark body,
+.dark #root,
+.dark .min-h-screen {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Force dark mode background on any container backgrounds */
+.dark .bg-white,
+.dark .bg-slate-50,
+.dark .bg-zinc-50,
+.dark .bg-zinc-100,
+.dark .bg-slate-100,
+.dark .bg-zinc-50\/50,
+.dark .bg-sky-50,
+.dark .bg-sky-50\/25,
+.dark .bg-sky-50\/45,
+.dark .bg-sky-950\/45,
+.dark .bg-[#121826],
+.dark .bg-[#0E131F],
+.dark .bg-[#0B0F19],
+.dark .bg-[#070A13],
+.dark .bg-[#111622],
+.dark .bg-[#1A2030],
+.dark .bg-[#1D2536],
+.dark .bg-[#171E2E],
+.dark .bg-[#182030],
+.dark aside,
+.dark header,
+.dark nav,
+.dark section,
+.dark table,
+.dark tr,
+.dark td,
+.dark article,
+.dark .max-w-md,
+.dark .rounded-2xl {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #1a1a1a !important;
+}
+
+/* Explicit heading and structural text visibility overrides */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark legend,
+.dark strong,
+.dark th,
+.dark .text-slate-900,
+.dark .text-zinc-950,
+.dark .text-zinc-900,
+.dark .text-slate-800,
+.dark .text-zinc-800,
+.dark .text-slate-700,
+.dark .text-zinc-700 {
+  color: #ffffff !important;
+}
+
+/* Secondary body text clarity overrides */
+.dark p,
+.dark td,
+.dark .text-slate-600,
+.dark .text-zinc-650,
+.dark .text-zinc-600,
+.dark .text-slate-500,
+.dark .text-zinc-500,
+.dark .text-zinc-400,
+.dark .text-slate-400 {
+  color: #d4d4d8 !important; /* light readable silver */
+}
+
+/* Form Elements Styling (inputs, selects, buttons) */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #000000 !important;
+  border-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a !important;
+}
+
+/* Keep Brand Accent Items Contrast-Safe & Vibrant */
+.dark .text-sky-500,
+.dark .text-sky-600,
+.dark .text-sky-700,
+.dark .text-sky-800,
+.dark .text-sky-850,
+.dark .text-sky-900,
+.dark .text-sky-950 {
+  color: #38bdf8 !important; /* sky-400 */
+}
+
+.dark .text-emerald-500,
+.dark .text-emerald-600,
+.dark .text-emerald-700,
+.dark .text-emerald-750,
+.dark .text-emerald-800,
+.dark .text-emerald-850,
+.dark .text-emerald-900,
+.dark .text-emerald-950 {
+  color: #34d399 !important; /* emerald-400 */
+}
+
+.dark .bg-emerald-50,
+.dark .bg-emerald-950\/40 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.dark .bg-sky-850/60,
+.dark .bg-sky-800\/60,
+.dark .bg-sky-905,
+.dark .bg-sky-950 {
+  background-color: #0c1524 !important;
+}
+
+/* Visual border cleanup */
+.dark .border,
+.dark .border-t,
+.dark .border-b,
+.dark .border-r,
+.dark .border-l,
+.dark .border-zinc-150,
+.dark .border-zinc-200,
+.dark .border-slate-200,
+.dark .border-slate-100,
+.dark .border-slate-800,
+.dark .border-sky-900,
+.dark .border-zinc-250 {
+  border-color: #1f1f1f !important;
+}
+
+/* Keep interactive state selections clear and hover states visible */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-zinc-50:hover,
+.dark .hover\:bg-zinc-100:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-slate-200:hover,
+.dark .hover\:bg-slate-800\/40:hover {
+  background-color: #0d0d0d !important;
+  color: #ffffff !important;
+}
+
+/* Modal layers */
+.dark .bg-slate-900\/60,
+.dark .bg-white\/60,
+.dark .backdrop-blur-md,
+.dark .bg-zinc-950\/60 {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Fix compliance notice boxes visibility */
+.dark .bg-amber-50\/55,
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.dark .text-amber-900,
+.dark .text-amber-800\/80 {
+  color: #fde047 !important; /* yellow-300 */
+}

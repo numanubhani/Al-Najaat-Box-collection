@@ -1,0 +1,6 @@
+{
+  "name": "NGO Donation Box Management System",
+  "description": "A comprehensive frontend management system for tracking donation boxes, enabling collectors to record collections and administrators to monitor analytics, generate reports, and print bulk QR code labels.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
