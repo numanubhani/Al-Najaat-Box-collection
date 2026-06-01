@@ -107,8 +107,19 @@ export const INITIAL_EXPENSES: ExpenseRecord[] = [
   }
 ];
 
+export interface UserRegistration {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  date: string;
+}
+
 export const INITIAL_COLLECTORS: Collector[] = [
   { id: 'COL-001', name: 'John Smith', phone: '+1 (555) 234-5678', email: 'john.smith@helperngo.org', status: 'Active' },
+  { id: 'COL-002', name: 'Naib Khan', phone: '+92 (300) 123-4567', email: 'naib@gmail.com', status: 'Active' },
 ];
 
 export const INITIAL_BOXES: DonationBox[] = [

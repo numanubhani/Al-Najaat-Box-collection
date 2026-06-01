@@ -12,6 +12,7 @@ import QRManager from './components/QRManager';
 import CollectorManagement from './components/CollectorManagement';
 import CollectionRecords from './components/CollectionRecords';
 import ReportsModule from './components/ReportsModule';
+import CustomerList from './components/CustomerList';
 import RegulatoryList from './components/RegulatoryList';
 import CollectorView from './components/CollectorView';
 import {
@@ -51,7 +52,7 @@ function NGOAppContent() {
 
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<
-    'dashboard' | 'boxes' | 'qrs' | 'collectors' | 'records' | 'reports' | 'compliance'
+    'dashboard' | 'boxes' | 'customers' | 'collectors' | 'records' | 'reports' | 'compliance'
   >('dashboard');
 
   // Notification dropdown state
@@ -163,13 +164,13 @@ function NGOAppContent() {
               <nav className="p-4 space-y-1">
                 {(
                   [
-                    { id: 'dashboard', label: 'Executive Dashboard', icon: LayoutDashboard },
-                    { id: 'boxes', label: 'Donation Boxes', icon: Box },
-                    { id: 'qrs', label: 'QR Code Stickers', icon: QrCode },
-                    { id: 'collectors', label: 'Field Collectors', icon: Users },
-                    { id: 'records', label: 'Collection Ledger', icon: History },
-                    { id: 'reports', label: 'Reports compiler', icon: FileCheck },
-                    { id: 'compliance', label: 'Compliance & Demands', icon: ClipboardList },
+                    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                    { id: 'boxes', label: 'Donation Boxes Status', icon: Box },
+                    { id: 'customers', label: 'Customer List', icon: Users },
+                    { id: 'collectors', label: 'Collector', icon: UserCheck },
+                    { id: 'records', label: 'Ledger', icon: History },
+                    { id: 'reports', label: 'Report', icon: FileCheck },
+                    { id: 'compliance', label: 'Complain and new box issue', icon: ClipboardList },
                   ] as const
                 ).map((tab) => {
                   const Icon = tab.icon;
@@ -268,44 +269,64 @@ function NGOAppContent() {
  
                   {/* 2. Notification dropdown floating card */}
                   {isNotifOpen && (
-                    <div className="absolute right-0 mt-2.5 w-76 bg-white dark:bg-[#121826] border border-zinc-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 text-left">
-                      <div className="p-3 border-b border-zinc-100 dark:border-slate-800 flex items-center justify-between bg-zinc-50/50 dark:bg-slate-900/40">
-                        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">System Notification Hub</span>
+                    <div className="absolute right-0 mt-3 w-85 bg-white dark:bg-[#0F172A] border border-zinc-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 text-left text-zinc-850 dark:text-zinc-100">
+                      <div className="p-4 border-b border-zinc-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-extrabold text-xs tracking-wider uppercase text-slate-700 dark:text-zinc-200">Alert Center</span>
+                          {unreadNotifs.length > 0 && (
+                            <span className="bg-rose-500 text-white text-[10px] font-mono font-bold px-1.5 py-0.25 rounded-md">
+                              {unreadNotifs.length} New
+                            </span>
+                          )}
+                        </div>
                         {unreadNotifs.length > 0 && (
                           <button
                             onClick={markAllNotificationsRead}
-                            className="text-[10px] text-sky-700 dark:text-sky-400 hover:underline font-semibold"
+                            className="text-[10px] text-sky-655 dark:text-sky-400 hover:underline font-bold transition-all cursor-pointer"
                           >
                             Mark all read
                           </button>
                         )}
                       </div>
  
-                      <div className="divide-y divide-zinc-100 dark:divide-slate-800 max-h-[300px] overflow-y-auto">
+                      <div className="divide-y divide-zinc-100 dark:divide-slate-800/80 max-h-[340px] overflow-y-auto">
                         {notifications.length === 0 ? (
-                          <div className="p-4 text-center text-zinc-400 dark:text-zinc-500 text-xs">
-                             Zero notification alerts registered.
+                          <div className="p-8 text-center text-zinc-400 dark:text-zinc-500 text-xs text-center">
+                             <Bell className="w-6 h-6 mx-auto mb-2 text-zinc-300" />
+                             <p className="font-semibold text-zinc-600">Zero active alerts</p>
+                             <p className="text-[10px] text-zinc-400 mt-0.5">Everything is current and clear.</p>
                           </div>
                         ) : (
-                          notifications.map((notif) => (
-                            <div
-                              key={notif.id}
-                              onClick={() => markNotificationRead(notif.id)}
-                              className={`p-3 text-xs hover:bg-zinc-50 dark:hover:bg-slate-800/40 cursor-pointer transition ${
-                                !notif.read ? 'bg-sky-50/25 dark:bg-sky-950/20 border-l-2 border-sky-500' : ''
-                              }`}
-                            >
-                              <div className="flex items-start justify-between">
-                                <span className="font-semibold text-zinc-850 dark:text-zinc-200 block">{notif.title}</span>
-                                <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0 font-medium ml-1">
-                                  {notif.time}
-                                </span>
+                          notifications.map((notif) => {
+                            const isUnread = !notif.read;
+                            return (
+                              <div
+                                key={notif.id}
+                                onClick={() => markNotificationRead(notif.id)}
+                                className={`p-4 text-xs hover:bg-slate-50 dark:hover:bg-slate-800/25 cursor-pointer transition-colors relative flex gap-3 ${
+                                  isUnread ? 'bg-sky-500/[0.03]' : ''
+                                }`}
+                              >
+                                {isUnread && (
+                                  <span className="absolute top-4 left-1.5 w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                )}
+                                
+                                <div className="flex-grow space-y-1 select-none">
+                                  <div className="flex items-start justify-between">
+                                    <span className={`font-bold text-slate-850 dark:text-zinc-150 leading-tight block ${isUnread ? 'font-extrabold text-slate-900' : ''}`}>
+                                      {notif.title}
+                                    </span>
+                                    <span className="text-[9px] text-zinc-450 dark:text-zinc-500 font-mono font-bold shrink-0 ml-1.5 whitespace-nowrap">
+                                      {notif.time}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-zinc-500 dark:text-zinc-405 leading-relaxed font-semibold">
+                                    {notif.description}
+                                  </p>
+                                </div>
                               </div>
-                              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
-                                {notif.description}
-                              </p>
-                            </div>
-                          ))
+                            );
+                          })
                         )}
                       </div>
                     </div>
@@ -324,10 +345,10 @@ function NGOAppContent() {
             <main className="p-6 md:p-8 flex-grow overflow-y-auto max-h-[calc(100vh-140px)]">
               {activeAdminTab === 'dashboard' && <AdminDashboard />}
               {activeAdminTab === 'boxes' && <BoxManagement />}
-              {activeAdminTab === 'qrs' && <QRManager />}
+              {activeAdminTab === 'customers' && <CustomerList />}
               {activeAdminTab === 'collectors' && <CollectorManagement />}
-              {activeAdminTab === 'records' && <CollectionRecords />}
-              {activeAdminTab === 'reports' && <ReportsModule />}
+              {activeAdminTab === 'records' && <ReportsModule defaultTab="ledger" />}
+              {activeAdminTab === 'reports' && <ReportsModule defaultTab="report" />}
               {activeAdminTab === 'compliance' && <RegulatoryList />}
             </main>
 

@@ -27,10 +27,13 @@ import {
 } from 'lucide-react';
 
 export const CollectorManagement: React.FC = () => {
-  const { collectors, donationBoxes, collections, updateCollectorStatus } = useNGOStore();
+  const { collectors, donationBoxes, collections, updateCollectorStatus, registrations, approveRegistration, rejectRegistration } = useNGOStore();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Disabled'>('All');
+  
+  // Pending approvals filtered list
+  const pendingRequests = registrations ? registrations.filter(r => r.status === 'Pending') : [];
   
   // Dialog modal state
   const [selectedCollector, setSelectedCollector] = useState<Collector | null>(null);
@@ -98,6 +101,67 @@ export const CollectorManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* 1. Registration Requests Approvals Panel */}
+      {pendingRequests.length > 0 && (
+        <div className="bg-sky-50/50 border border-sky-150 rounded-2xl p-5 shadow-inner">
+          <div className="flex items-center justify-between pb-3.5 border-b border-sky-100">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1 px-2 text-sky-800 bg-sky-100 font-mono text-[10px] font-black rounded-lg shrink-0">
+                {pendingRequests.length} REQUESTS
+              </span>
+              <div>
+                <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Staff Registration Approvals</h2>
+                <p className="text-[10px] text-zinc-500 mt-0.5">Approve newly requested collector profiles to grant them sandbox scanning ledger access.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {pendingRequests.map((req) => (
+              <div key={req.id} className="bg-white border border-slate-200/80 p-4 rounded-xl flex flex-col justify-between shadow-3xs hover:shadow-2xs transition-shadow">
+                <div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="block font-extrabold text-slate-850 text-xs">{req.name}</span>
+                      <span className="text-[10px] text-zinc-400 block mt-0.5 font-mono">{req.email}</span>
+                    </div>
+                    <span className="inline-flex px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-zinc-50 border border-zinc-150 rounded-full text-slate-500">
+                      {req.role}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-3 text-[10px] text-slate-550 border-t border-dashed border-zinc-150 pt-2.5">
+                    <div>
+                      <span className="block text-zinc-400 font-mono font-bold uppercase text-[8px] tracking-wide mb-0.5">Contact Line:</span>
+                      <span className="font-semibold text-slate-700">{req.phone}</span>
+                    </div>
+                    <div>
+                      <span className="block text-zinc-400 font-mono font-bold uppercase text-[8px] tracking-wide mb-0.5">Registered:</span>
+                      <span className="font-semibold text-slate-700">{req.date}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mt-4 pt-3 border-t border-zinc-50">
+                  <button
+                    onClick={() => rejectRegistration(req.id)}
+                    className="flex-grow py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-bold cursor-pointer transition text-center"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => approveRegistration(req.id)}
+                    className="flex-grow py-1.5 bg-sky-600 hover:bg-sky-700 border border-sky-600 text-white rounded-lg text-xs font-bold cursor-pointer transition text-center"
+                  >
+                    Approve Staff
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-950 tracking-tight">Active NGO Collectors</h1>

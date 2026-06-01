@@ -13,6 +13,7 @@ import {
   BoxDemand,
   NotificationItem,
   ExpenseRecord,
+  UserRegistration,
   INITIAL_COLLECTORS,
   INITIAL_BOXES,
   INITIAL_COLLECTIONS,
@@ -29,6 +30,11 @@ interface NGOContextType {
   userEmail: string;
   login: (email: string, role: Role) => void;
   logout: () => void;
+  
+  registrations: UserRegistration[];
+  registerUser: (name: string, email: string, phone: string, role: Role) => void;
+  approveRegistration: (id: string) => void;
+  rejectRegistration: (id: string) => void;
   
   donationBoxes: DonationBox[];
   createDonationBox: (box: Omit<DonationBox, 'id'>) => DonationBox;
@@ -69,9 +75,9 @@ interface NGOContextType {
 const NGOContext = createContext<NGOContextType | undefined>(undefined);
 
 export const NGOStoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<Role>('Admin');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true); // Logged in by default for high-fidelity interactive flow
-  const [userEmail, setUserEmail] = useState<string>('admin@ngo.org');
+  const [role, setRole] = useState<Role>(() => (localStorage.getItem('ngo_role') as Role) || 'Admin');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => localStorage.getItem('ngo_logged_in') === 'true');
+  const [userEmail, setUserEmail] = useState<string>(() => localStorage.getItem('ngo_user_email') || 'Admin@gmail.com');
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const cached = localStorage.getItem('ngo_theme');
@@ -94,6 +100,31 @@ export const NGOStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [collectors, setCollectors] = useState<Collector[]>(() => {
     const cached = localStorage.getItem('ngo_collectors');
     return cached ? JSON.parse(cached) : INITIAL_COLLECTORS;
+  });
+
+  const [registrations, setRegistrations] = useState<UserRegistration[]>(() => {
+    const cached = localStorage.getItem('ngo_registrations');
+    if (cached) return JSON.parse(cached);
+    return [
+      {
+        id: 'REG-101',
+        name: 'Sajid Khan',
+        email: 'sajid@gmail.com',
+        phone: '+92 (315) 987-6543',
+        role: 'Collector',
+        status: 'Pending',
+        date: '2026-06-01'
+      },
+      {
+        id: 'REG-102',
+        name: 'Arsalan Shah',
+        email: 'arsalan@gmail.com',
+        phone: '+92 (333) 222-1111',
+        role: 'Collector',
+        status: 'Pending',
+        date: '2026-06-01'
+      }
+    ];
   });
   
   const [collections, setCollections] = useState<CollectionRecord[]>(() => {
@@ -160,15 +191,78 @@ export const NGOStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('ngo_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
+  useEffect(() => {
+    localStorage.setItem('ngo_registrations', JSON.stringify(registrations));
+  }, [registrations]);
+
   // Auth simulators
   const login = (email: string, chosenRole: Role) => {
     setUserEmail(email);
     setRole(chosenRole);
     setIsLoggedIn(true);
+    localStorage.setItem('ngo_logged_in', 'true');
+    localStorage.setItem('ngo_role', chosenRole);
+    localStorage.setItem('ngo_user_email', email);
   };
 
   const logout = () => {
     setIsLoggedIn(false);
+    localStorage.setItem('ngo_logged_in', 'false');
+  };
+
+  const registerUser = (name: string, email: string, phone: string, chosenRole: Role) => {
+    const newReg: UserRegistration = {
+      id: `REG-${100 + registrations.length + 1}`,
+      name,
+      email,
+      phone,
+      role: chosenRole,
+      status: 'Pending',
+      date: new Date().toISOString().split('T')[0]
+    };
+    setRegistrations((prev) => [newReg, ...prev]);
+    addNotification('demand', 'New Account Registration Created', `${name} brand-new registration for ${chosenRole}. Approval required.`);
+  };
+
+  const approveRegistration = (id: string) => {
+    setRegistrations((prev) =>
+      prev.map((reg) => {
+        if (reg.id === id) {
+          if (reg.role === 'Collector') {
+            const nextNum = collectors.length + 1;
+            const colId = `COL-00${nextNum}`;
+            const alreadyExists = collectors.some(c => c.email.toLowerCase() === reg.email.toLowerCase());
+            if (!alreadyExists) {
+              setCollectors((curr) => [
+                ...curr,
+                {
+                  id: colId,
+                  name: reg.name,
+                  phone: reg.phone,
+                  email: reg.email,
+                  status: 'Active'
+                }
+              ]);
+            }
+          }
+          addNotification('demand', 'Registration Approved', `Staff ${reg.name} was approved for ${reg.role} role.`);
+          return { ...reg, status: 'Approved' };
+        }
+        return reg;
+      })
+    );
+  };
+
+  const rejectRegistration = (id: string) => {
+    setRegistrations((prev) =>
+      prev.map((reg) => {
+        if (reg.id === id) {
+          addNotification('demand', 'Registration Rejected', `Staff ${reg.name} was rejected.`);
+          return { ...reg, status: 'Rejected' };
+        }
+        return reg;
+      })
+    );
   };
 
   // Notification engine
@@ -396,6 +490,10 @@ export const NGOStoreProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         userEmail,
         login,
         logout,
+        registrations,
+        registerUser,
+        approveRegistration,
+        rejectRegistration,
         donationBoxes,
         createDonationBox,
         updateDonationBox,
