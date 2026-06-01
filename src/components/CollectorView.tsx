@@ -483,138 +483,158 @@ export const CollectorView: React.FC = () => {
            ---------------------------------------------------- */}
         {activeView === 'dashboard' && (
           <div className="space-y-6">
-            
-            {/* KPI Stat Cards Grid - matches Admin styling */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center justify-between mb-3 text-slate-400">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-zinc-400 font-mono">Monthly Shift Total</span>
-                  <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center">
-                    <DollarSign className="w-4 h-4" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black font-mono text-slate-900 dark:text-white">${totalMyCollectionsSum.toFixed(2)}</h3>
-                  <p className="text-[10px] text-slate-550 dark:text-zinc-400 mt-1 font-mono">My secure processed payouts</p>
-                </div>
+            {/* COMPLIANCE META SUMMARY STRIP */}
+            <div className="bg-sky-50 dark:bg-sky-950/20 border border-sky-150 dark:border-sky-900/40 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="font-mono text-slate-700 dark:text-zinc-350 font-bold">
+                  Active Collector: <strong className="text-slate-900 dark:text-white font-black">{mockCollectorName}</strong> (ID: {mockCollectorId})
+                </span>
+                <span className="text-[9px] bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-305 py-0.5 px-2 rounded font-mono font-bold uppercase border border-sky-200/50">
+                  June 2026 Cycle
+                </span>
               </div>
-
-              <div className="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center justify-between mb-3 text-slate-400">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-zinc-400 font-mono">Assigned Box Assets</span>
-                  <div className="w-8 h-8 rounded-lg bg-[#E0F2FE] dark:bg-sky-950 text-sky-700 dark:text-sky-400 flex items-center justify-center">
-                    <Building className="w-4 h-4" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-                    {donationBoxes.filter(box => box.collectorId === mockCollectorId).length} Active
-                  </h3>
-                  <p className="text-[10px] text-slate-550 dark:text-zinc-400 mt-1 font-mono">Shops in Karachi auto-route</p>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center justify-between mb-3 text-slate-400">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-zinc-400 font-mono">Claims Filed</span>
-                  <div className="w-8 h-8 rounded-lg bg-amber-55 text-amber-600 flex items-center justify-center bg-amber-50 dark:bg-amber-950/20">
-                    <Receipt className="w-4 h-4 text-amber-600" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black font-mono text-slate-900 dark:text-white">${totalMyExpensesSum.toFixed(2)}</h3>
-                  <p className="text-[10px] text-slate-550 dark:text-zinc-400 mt-1 font-mono">{myExpenses.length} files awaiting verification</p>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-black p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center justify-between mb-3 text-slate-400">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-zinc-400 font-mono">Compliance rating</span>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-605 flex items-center justify-center font-bold">
-                    A+
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black font-mono text-slate-900 dark:text-white">Passing</h3>
-                  <p className="text-[10px] text-slate-550 dark:text-zinc-400 mt-1 font-mono">Licensed for active collection</p>
-                </div>
+              <div className="flex items-center gap-4 text-[11px] font-mono whitespace-nowrap">
+                <span className="text-zinc-500 dark:text-zinc-400">
+                  Cleared Cash: <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">${totalMyCollectionsSum.toFixed(2)}</strong>
+                </span>
+                <span className="text-zinc-500 dark:text-zinc-400 border-l border-slate-200 dark:border-slate-800 pl-4">
+                  Claims Filed: <strong className="text-amber-700 dark:text-amber-400 font-extrabold">${totalMyExpensesSum.toFixed(2)}</strong>
+                </span>
               </div>
             </div>
 
-            {/* DUAL WORKSPACE PANEL COLUMNS */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                           {/* PRIMARY COLS: MY ASSIGNED BOXES AUTO-ROUTE (Left Area) */}
-              <div className="lg:col-span-2 space-y-4">
-                <div className="bg-white dark:bg-black border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-805 pb-4 mb-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-650 flex items-center justify-center">
-                        <Map className="w-4.5 h-4.5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-mono">My Assigned Boxes (This Month)</h3>
-                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">Verify coordinates, dial shops or process cash collection yields.</p>
-                      </div>
-                    </div>
-                    <span className="text-[9px] font-bold bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-305 py-1 px-3 rounded-md font-mono uppercase border border-sky-150 dark:border-sky-900/40 self-start sm:self-center">
-                      Auto-routed Map List
-                    </span>
-                  </div>
+            {/* FOUR CARD STYLE OPTIONS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Card 1: Collect Box */}
+              <button
+                id="btn-collect-box"
+                onClick={() => {
+                  setActiveView('scan');
+                  setScanStep('camera');
+                  resetScanFlow();
+                }}
+                className="bg-white dark:bg-black p-6 rounded-2xl border-2 border-sky-500/30 dark:border-sky-500/20 hover:border-sky-500 hover:ring-2 hover:ring-sky-500/10 cursor-pointer text-left transition duration-200 flex flex-col justify-between h-44 shadow-xs group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                  <Camera className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white leading-tight font-sans">Collect Box</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 leading-snug">Open camera to scan QR code & record cash yield</p>
+                </div>
+              </button>
 
-                  {/* Monthly Shift Routine Progress bar */}
-                  <div className="mb-6 p-4 bg-sky-50 hover:bg-sky-100/50 dark:bg-sky-950/15 dark:hover:bg-sky-950/25 border border-sky-100 dark:border-sky-900/20 rounded-xl transition-all duration-300">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-black text-slate-800 dark:text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <Coins className="w-4 h-4 text-sky-500 animate-bounce" /> Current Collection Routine Progress
-                      </span>
-                      <span className="text-xs font-mono font-black text-sky-700 dark:text-sky-400">
-                        {myCollectedBoxIdsThisMonth.length} / {myAssignedBoxes.length} boxes cleared
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-zinc-800 h-2.5 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-sky-600 dark:bg-sky-500 h-full rounded-full transition-all duration-500" 
-                        style={{ width: `${myAssignedBoxes.length > 0 ? (myCollectedBoxIdsThisMonth.length / myAssignedBoxes.length) * 100 : 0}%` }}
-                      ></div>
-                    </div>
-                    {pendingUncollectedBoxes.length > 0 ? (
-                      <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-2 font-mono">
-                        ⚠️ Attention Agent John: <strong>{pendingUncollectedBoxes.length} boxes</strong> require collection dispatch before the shift expiration.
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-emerald-700 dark:text-emerald-400 mt-2 font-mono font-bold flex items-center gap-1">
-                        ✨ Shift Clearance Unlocked: All assigned boxes successfully processed!
-                      </p>
-                    )}
-                  </div>
+              {/* Card 2: Add Complain */}
+              <button
+                id="btn-add-complain"
+                onClick={() => {
+                  setActiveView('issue');
+                }}
+                className="bg-white dark:bg-black p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500 hover:ring-2 hover:ring-amber-500/10 cursor-pointer text-left transition duration-200 flex flex-col justify-between h-44 shadow-xs group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white leading-tight font-sans">Add Complain</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 leading-snug">Report sticky locks, damaged boxes, or key issues</p>
+                </div>
+              </button>
 
-                  {/* SUBTAB TOGGLES (Pending Stack vs Master Assigned Ledger) */}
-                  <div className="flex bg-[#F1F5F9] dark:bg-zinc-950 p-1 rounded-xl gap-1 mb-5 border border-slate-200/50 dark:border-slate-850">
-                    <button
-                      type="button"
-                      onClick={() => setDashboardSubTab('pending')}
-                      className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition duration-150 flex items-center justify-center gap-2 cursor-pointer ${
-                        dashboardSubTab === 'pending'
-                          ? 'bg-white dark:bg-[#070A13] text-sky-600 dark:text-sky-450 shadow-sm border border-slate-200 dark:border-slate-800'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
-                      }`}
-                    >
-                      <Clock className="w-3.5 h-3.5 shrink-0" />
-                      Pending Collection List ({pendingUncollectedBoxes.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDashboardSubTab('all')}
-                      className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition duration-150 flex items-center justify-center gap-2 cursor-pointer ${
-                        dashboardSubTab === 'all'
-                          ? 'bg-white dark:bg-[#070A13] text-sky-600 dark:text-sky-450 shadow-sm border border-slate-200 dark:border-slate-800'
-                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
-                      }`}
-                    >
-                      <Map className="w-3.5 h-3.5 shrink-0" />
-                      All Assigned Boxes Ledger ({myAssignedBoxes.length})
-                    </button>
+              {/* Card 3: Add Expense */}
+              <button
+                id="btn-add-expense"
+                onClick={() => {
+                  setActiveView('expense');
+                }}
+                className="bg-white dark:bg-black p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-rose-500 hover:ring-2 hover:ring-rose-500/10 cursor-pointer text-left transition duration-200 flex flex-col justify-between h-44 shadow-xs group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                  <Receipt className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white leading-tight font-sans">Add Expense</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 leading-snug">Submit fuel receipt & field travel claims</p>
+                </div>
+              </button>
+
+              {/* Card 4: Add New Box Request */}
+              <button
+                id="btn-add-new-box"
+                onClick={() => {
+                  setActiveView('demand');
+                }}
+                className="bg-white dark:bg-black p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/10 cursor-pointer text-left transition duration-200 flex flex-col justify-between h-44 shadow-xs group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-450 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                  <PlusSquare className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white leading-tight font-sans">Add New Box Request</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 leading-snug">Propose new high foot-traffic locations</p>
+                </div>
+              </button>
+            </div>            {/* STREAMLINED OPERATIONAL WORKSPACE (Full width for mobile, PC-responsive) */}
+            <div className="space-y-6">
+              
+              {/* Shift Routine Progress Bar */}
+              <div className="bg-gradient-to-r from-sky-500/10 to-teal-500/5 dark:from-sky-950/20 dark:to-teal-950/10 border border-sky-100 dark:border-sky-900/40 p-5 rounded-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-5 h-5 text-sky-600 dark:text-sky-400 animate-pulse" />
+                    <div>
+                      <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider font-mono block">
+                        Shift Collection Progress
+                      </span>
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
+                        June 2026 target frequency rota
+                      </span>
+                    </div>
                   </div>
+                  <span className="text-sm font-mono font-black text-sky-700 dark:text-sky-400 self-start sm:self-center font-bold">
+                    {myCollectedBoxIdsThisMonth.length} / {myAssignedBoxes.length} Boxes Cleared ({myAssignedBoxes.length > 0 ? Math.round((myCollectedBoxIdsThisMonth.length / myAssignedBoxes.length) * 100) : 0}%)
+                  </span>
+                </div>
+                <div className="w-full bg-slate-100 dark:bg-zinc-900 h-3 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-800">
+                  <div 
+                    className="bg-gradient-to-r from-sky-600 to-teal-500 h-full rounded-full transition-all duration-500" 
+                    style={{ width: `${myAssignedBoxes.length > 0 ? (myCollectedBoxIdsThisMonth.length / myAssignedBoxes.length) * 100 : 0}%` }}
+                  ></div>
+                </div>
+                {pendingUncollectedBoxes.length > 0 ? (
+                  <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-3 font-mono">
+                    ⚠️ <strong>{pendingUncollectedBoxes.length} uncollected boxes</strong> require clearance scan. Use "Scan to Collect" below to activate camera.
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-3 font-mono font-bold flex items-center gap-1">
+                    ✨ Sparkle Clearance: All assigned route boxes cleared successfully! Excellent work!
+                  </p>
+                )}
+              </div>
+
+              {/* UNCOLLECTED BOXES LIST HEADER CONTAINER */}
+              <div className="bg-white dark:bg-black border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-900 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-405 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-mono">
+                        Uncollected Boxes ({pendingUncollectedBoxes.length})
+                      </h3>
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
+                        Your assigned partner store list pending collection:
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold bg-amber-55 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 py-1 px-3 rounded-full border border-amber-200 dark:border-amber-900/30 w-max">
+                    Pending Clearance
+                  </span>
+                </div>
+
+                  {/* STREAMLINED SINGLE VIEW LIST OF ASSIGNED BOXES */}
 
                   {/* COMPACT LIST ROW VIEW */}
                   <div className="space-y-3.5">
@@ -677,14 +697,14 @@ export const CollectorView: React.FC = () => {
                                 type="button"
                                 onClick={() => {
                                   setScannedBox(box);
-                                  setScanStep('form');
+                                  setScanStep('camera');
                                   setActiveView('scan');
                                   setCollectAmount('');
                                   setCollectNotes('');
                                 }}
-                                className="flex-1 py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-[11px] text-center transition flex items-center justify-center gap-1 cursor-pointer shadow-xs whitespace-nowrap"
+                                className="flex-1 py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-[11px] text-center transition flex items-center justify-center gap-1 cursor-pointer shadow-xs whitespace-nowrap animate-pulse"
                               >
-                                <Coins className="w-3.5 h-3.5 text-white" /> Quick Cash
+                                <Camera className="w-3.5 h-3.5 text-white" /> Scan to Collect
                               </button>
                             </div>
                           </div>
@@ -862,7 +882,6 @@ export const CollectorView: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
 
               {/* SIDEBAR COL: DISPATCH OPERATIONS CONTROL (Right Area) */}
               <div className="space-y-4">
