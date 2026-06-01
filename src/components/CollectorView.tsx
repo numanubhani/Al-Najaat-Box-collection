@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useNGOStore } from '../store';
 import { DonationBox, IssueReport, BoxDemand, ExpenseRecord } from '../types';
+import { QRCameraScanner } from './QRCameraScanner';
 import {
   Coins,
   AlertTriangle,
@@ -973,39 +974,19 @@ export const CollectorView: React.FC = () => {
           <div className="max-w-xl mx-auto bg-white dark:bg-black p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md w-full">
             
             {scanStep === 'camera' && (
-              <div className="space-y-6">
-                <div className="relative aspect-square sm:aspect-video w-full bg-zinc-950 rounded-2xl border-4 border-zinc-800 overflow-hidden flex flex-col items-center justify-center text-center">
-                  <div className={`absolute left-0 w-full h-[3px] bg-sky-500 shadow-[0_0_12px_#0284c7] ${isScanning ? 'top-1/2 -translate-y-1/2 animate-bounce' : 'top-10'}`}></div>
-
-                  <div className="absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 border-sky-500 rounded-tl"></div>
-                  <div className="absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 border-sky-500 rounded-tr"></div>
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-sky-500 rounded-bl"></div>
-                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-sky-500 rounded-br"></div>
-
-                  <div className="p-4 relative z-10 text-white">
-                    <Camera className="w-12 h-12 text-sky-400 mx-auto mb-4" />
-                    {isScanning ? (
-                      <span className="text-xs text-sky-400 font-mono tracking-widest uppercase animate-pulse font-bold">
-                        Decoding Secure Holographic QR Sticker...
-                      </span>
-                    ) : (
-                      <div className="space-y-1">
-                        <span className="text-sm font-black text-zinc-100 block">Position Sticker Under Light</span>
-                        <p className="text-[11px] text-zinc-400 leading-relaxed max-w-sm mx-auto">
-                          EcoGrowth secure boxes are labeled with high-contrast sticker values. Use the simulation panel on active operations menu to select a shop.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-sky-50 dark:bg-sky-950/20 border border-sky-150 dark:border-sky-900/30 rounded-xl">
-                  <span className="text-[10px] font-mono text-sky-700 dark:text-sky-305 font-bold block uppercase mb-1">Testing Tip:</span>
-                  <p className="text-xs text-slate-650 dark:text-zinc-400">
-                    Use the <strong>Operations Panel</strong> shortcuts to tap any box and instantly lock its location into the record ledger.
-                  </p>
-                </div>
-              </div>
+              <QRCameraScanner
+                donationBoxes={donationBoxes}
+                onScanSuccess={(box) => {
+                  setScannedBox(box);
+                  setScanStep('form');
+                  setCollectAmount('');
+                  setCollectNotes('');
+                  playScanSuccessSound();
+                }}
+                onCancel={() => {
+                  setActiveView('dashboard');
+                }}
+              />
             )}
 
             {scanStep === 'form' && scannedBox && (
