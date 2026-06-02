@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 export const CollectionRecords: React.FC = () => {
-  const { collections, collectors, donationBoxes } = useNGOStore();
+  const { collections, collectors, donationBoxes, sessionDate } = useNGOStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollectorId, setSelectedCollectorId] = useState('All');
@@ -56,12 +56,15 @@ export const CollectionRecords: React.FC = () => {
     let matchesDate = true;
     if (dateFilter !== 'All') {
       const itemDate = new Date(item.date);
-      const today = new Date('2026-06-01'); // Fixed relative date representing current metadata time
+      const today = new Date(sessionDate.iso);
       const diffTime = Math.abs(today.getTime() - itemDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (dateFilter === 'Today') {
-        matchesDate = item.date === '2026-06-01' || item.date === '2026-05-31'; // include extreme current cycle
+        const yesterday = new Date(sessionDate.iso);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayIso = yesterday.toISOString().split('T')[0];
+        matchesDate = item.date === sessionDate.iso || item.date === yesterdayIso;
       } else if (dateFilter === 'Last7Days') {
         matchesDate = diffDays <= 7;
       } else if (dateFilter === 'Last30Days') {

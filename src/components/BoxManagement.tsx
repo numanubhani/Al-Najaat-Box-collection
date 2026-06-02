@@ -79,12 +79,8 @@ export const BoxManagement: React.FC = () => {
     setMapLink('');
     setInstallationDate(new Date().toISOString().split('T')[0]);
     
-    // Choose first collector as default
-    if (collectors.length > 0) {
-      setCollectorId(collectors[0].id);
-    } else {
-      setCollectorId('');
-    }
+    // New donors are added unassigned by default.
+    setCollectorId('');
     
     setStatus('Active');
     setIsFormOpen(true);
@@ -108,7 +104,7 @@ export const BoxManagement: React.FC = () => {
   // Handle submit form
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!donorName || !address || !city || !contactNumber || !collectorId) {
+    if (!donorName || !address || !city || !contactNumber) {
       alert('Please fill out all required fields.');
       return;
     }
@@ -140,7 +136,7 @@ export const BoxManagement: React.FC = () => {
         address,
         city,
         contactNumber,
-        collectorId,
+        collectorId: collectorId || '',
         installationDate,
         notes,
         status: 'Active',
@@ -866,16 +862,15 @@ export const BoxManagement: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-430 mb-1" htmlFor="collectorId">
-                    Assigned Dispatch (Collector) *
+                    Assigned Dispatch (Collector) - Optional
                   </label>
                   <select
                     id="collectorId"
-                    required
                     value={collectorId}
                     onChange={(e) => setCollectorId(e.target.value)}
                     className="w-full px-3 py-2 bg-zinc-50 dark:bg-slate-900 border border-zinc-205 dark:border-slate-800 rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-808 dark:text-white shadow-3xs"
                   >
-                    <option value="">-- Select Staff --</option>
+                    <option value="">Unassigned (assign later)</option>
                     {collectors.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name} {c.status === 'Disabled' ? '(Disabled)' : ''}
@@ -942,7 +937,7 @@ export const BoxManagement: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-650 hover:bg-emerald-750 text-white rounded-lg text-xs font-extrabold cursor-pointer transition shadow-xs"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-extrabold cursor-pointer transition shadow-xs"
                 >
                   {editingBox ? 'Save Configuration' : 'Confirm & Print Secure Sticker'}
                 </button>

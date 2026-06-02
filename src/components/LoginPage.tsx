@@ -5,22 +5,20 @@
 
 import React, { useState } from 'react';
 import { useNGOStore } from '../store';
-import { Heart, ShieldCheck, UserCheck, Eye, EyeOff, Lock, Mail, Phone, User, CheckCircle } from 'lucide-react';
+import { Heart, Eye, EyeOff, Lock, Mail, Phone, User, CheckCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { login, registerUser, registrations, theme } = useNGOStore();
+  const { login, registerUser, theme } = useNGOStore();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   
   // Login Form State
   const [email, setEmail] = useState('Admin@gmail.com');
   const [password, setPassword] = useState('password123');
-  const [selectedRole, setSelectedRole] = useState<'Admin' | 'Collector'>('Admin');
   
   // Register Form State
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
-  const [regRole, setRegRole] = useState<'Admin' | 'Collector'>('Collector');
   
   // Common UI State
   const [showPassword, setShowPassword] = useState(false);
@@ -28,58 +26,21 @@ export const LoginPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleRoleSelect = (role: 'Admin' | 'Collector') => {
-    setSelectedRole(role);
-    if (role === 'Admin') {
-      setEmail('Admin@gmail.com');
-    } else {
-      setEmail('naib@gmail.com');
-    }
-  };
-
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
     setSuccessMsg('');
-
-    setTimeout(() => {
-      const normalizedEmail = email.trim().toLowerCase();
-      
-      // 1. Check direct dummy matches
-      if (normalizedEmail === 'admin@gmail.com') {
-        login(email, 'Admin');
-        setLoading(false);
-        return;
-      }
-      if (normalizedEmail === 'naib@gmail.com') {
-        login(email, 'Collector');
-        setLoading(false);
-        return;
-      }
-
-      // 2. Otherwise check if they are in approved registrations
-      const matchedReg = registrations.find(r => r.email.trim().toLowerCase() === normalizedEmail);
-      if (matchedReg) {
-        if (matchedReg.status === 'Approved') {
-          login(matchedReg.email, matchedReg.role);
-        } else if (matchedReg.status === 'Pending') {
-          setErrorMsg('Your registration request is still pending admin approval. Please wait.');
-        } else {
-          setErrorMsg('Your registration request was rejected.');
-        }
-        setLoading(false);
-        return;
-      }
-
-      // 3. To make it extremely friction-free for other emails entered during testing:
-      // Let's support arbitrary logins but with matching roles or alert testing notice
-      login(email, selectedRole);
+    try {
+      await login(email.trim(), password);
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Login failed. Please check your credentials.');
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regName || !regEmail || !regPhone) {
       setErrorMsg('Please populate all fields first.');
@@ -88,24 +49,21 @@ export const LoginPage: React.FC = () => {
 
     setLoading(true);
     setErrorMsg('');
-    setTimeout(() => {
-      registerUser(regName, regEmail, regPhone, regRole);
-      setSuccessMsg(`Registration requested successfully! Contact Admin (${regRole}) to approve your access request.`);
+    try {
+      await registerUser(regName, regEmail, regPhone, 'Collector');
+      setSuccessMsg('Registration requested successfully! Contact admin to approve your access request.');
       
-      // Reset forms
       setRegName('');
       setRegEmail('');
       setRegPhone('');
+      setEmail(regEmail);
+      setActiveTab('login');
+      setSuccessMsg('Account registered. Pending admin approval.');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Registration failed. Please try again.');
+    } finally {
       setLoading(false);
-      
-      // Toggle back to login tab with the registered email prefilled
-      setTimeout(() => {
-        setEmail(regEmail);
-        setSelectedRole(regRole);
-        setActiveTab('login');
-        setSuccessMsg(`Account registered. Pending Admin approval in the database!`);
-      }, 2000);
-    }, 850);
+    }
   };
 
   return (
@@ -251,31 +209,8 @@ export const LoginPage: React.FC = () => {
               </button>
             </form>
 
-            {/* Subtle Simulation Prefills Helper */}
-            <div className="mt-5.5 pt-4.5 border-t border-slate-100 dark:border-slate-800/80 text-center text-[10.5px] text-zinc-400 font-medium">
-              <span className="block mb-2 font-mono text-[9px] tracking-widest uppercase font-bold text-zinc-500">Demo Account Credentials</span>
-              <div className="flex gap-2 justify-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('Admin@gmail.com');
-                    setPassword('password123');
-                  }}
-                  className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 border border-slate-200/50 dark:border-slate-800 rounded-lg px-3 py-1.5 transition text-sky-700 dark:text-sky-400 hover:font-bold cursor-pointer font-bold block"
-                >
-                  Prefill Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('naib@gmail.com');
-                    setPassword('password123');
-                  }}
-                  className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 border border-slate-200/50 dark:border-slate-800 rounded-lg px-3 py-1.5 transition text-sky-700 dark:text-sky-400 hover:font-bold cursor-pointer font-bold block"
-                >
-                  Prefill Collector
-                </button>
-              </div>
+            <div className="mt-5.5 pt-4.5 border-t border-slate-100 dark:border-slate-800/80 text-center text-[10.5px] text-zinc-500 font-medium">
+              Use your real account credentials managed in backend.
             </div>
           </div>
         ) : (
@@ -341,38 +276,6 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">
-                Requested Role Status
-              </label>
-              <div className="grid grid-cols-2 gap-2 mt-1">
-                <button
-                  type="button"
-                  onClick={() => setRegRole('Collector')}
-                  className={`py-2 px-3 border rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
-                    regRole === 'Collector'
-                      ? 'border-sky-500 bg-sky-500/5 text-sky-700 dark:text-sky-400 font-bold'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  Collector
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRegRole('Admin')}
-                  className={`py-2 px-3 border rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
-                    regRole === 'Admin'
-                      ? 'border-sky-500 bg-sky-500/5 text-sky-700 dark:text-sky-400 font-bold'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Admin Staff
-                </button>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
@@ -387,22 +290,13 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
 
-        {/* Demo audit hints */}
         <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-col items-center gap-1">
           <span className="text-[10px] text-slate-400 dark:text-zinc-500 text-center uppercase font-mono font-bold tracking-wide">
-            Test Credentials Setup
+            Secure Access
           </span>
           <div className="w-full text-[10px] text-zinc-500 bg-slate-50 dark:bg-[#1E293B]/40 p-2.5 rounded-md border border-slate-200/40 dark:border-slate-800 space-y-1">
-            <div className="flex justify-between items-center text-[11px] text-slate-650 dark:text-zinc-330">
-              <span>Admin Profile:</span>
-              <span className="font-mono font-bold text-sky-650 dark:text-sky-400">Admin@gmail.com</span>
-            </div>
-            <div className="flex justify-between items-center text-[11px] text-slate-650 dark:text-zinc-330">
-              <span>Collector:</span>
-              <span className="font-mono font-bold text-sky-650 dark:text-sky-400">naib@gmail.com</span>
-            </div>
             <p className="text-[9px] text-zinc-400 mt-1 leading-normal italic text-center">
-              * Any password/PIN is accepted in sandbox routing. Registered users waiting approval must be approved by the Auditor!
+              Accounts are authenticated against backend credentials. New registrations require admin approval.
             </p>
           </div>
         </div>

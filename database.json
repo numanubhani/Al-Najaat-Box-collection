@@ -1,10 +1,85 @@
 {
-  "collectors": [],
-  "donationBoxes": [],
+  "collectors": [
+    {
+      "id": "COL-001",
+      "name": "Naib",
+      "phone": "+923106662529",
+      "email": "naib@gmail.com",
+      "status": "Active"
+    }
+  ],
+  "donationBoxes": [
+    {
+      "id": "BOX-0001",
+      "collectorId": "COL-001",
+      "installationDate": "2026-06-02",
+      "status": "Active",
+      "donorName": "Numan subhani",
+      "address": "H.no 552/c Gulgasht colony Multan",
+      "city": "personal",
+      "contactNumber": "+923106662520",
+      "notes": " [Re-assigned to dispatcher Naib on June 1, 2026]",
+      "mapLink": "https://maps.app.goo.gl/d5R7iYN96LCPEPUz8"
+    }
+  ],
   "collections": [],
   "issueReports": [],
   "boxDemands": [],
-  "notifications": [],
-  "expenses": [],
-  "registrations": []
+  "notifications": [
+    {
+      "id": "NOT-1780396094283",
+      "type": "issue",
+      "title": "Claim Submitted",
+      "description": "Naib Khan uploaded fuel claim for $500.00.",
+      "time": "Just now",
+      "read": false
+    },
+    {
+      "id": "NOT-1780395975305",
+      "type": "demand",
+      "title": "New Donation Box Mounted",
+      "description": "Numan subhani ledger registry completed in personal.",
+      "time": "Just now",
+      "read": false
+    },
+    {
+      "id": "NOT-1780395960837",
+      "type": "demand",
+      "title": "Registration Approved",
+      "description": "Account application of \"Naib\" was approved.",
+      "time": "Just now",
+      "read": false
+    },
+    {
+      "id": "NOT-1780395951924",
+      "type": "demand",
+      "title": "New Account Registration",
+      "description": "Naib filed an account application for Collector. Action needed.",
+      "time": "Just now",
+      "read": false
+    }
+  ],
+  "expenses": [
+    {
+      "id": "EXP-101",
+      "date": "2026-06-02",
+      "status": "Approved",
+      "collectorId": "COL-001",
+      "collectorName": "Naib Khan",
+      "category": "Petrol",
+      "amount": 500,
+      "description": "petrol"
+    }
+  ],
+  "registrations": [
+    {
+      "id": "REG-101",
+      "name": "Naib",
+      "email": "naib@gmail.com",
+      "phone": "+923106662529",
+      "role": "Collector",
+      "status": "Approved",
+      "date": "2026-06-02"
+    }
+  ]
 }

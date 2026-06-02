@@ -23,11 +23,12 @@ import {
   MapPin,
   TrendingUp,
   AlertTriangle,
-  FileCheck
+  FileCheck,
+  KeyRound
 } from 'lucide-react';
 
 export const CollectorManagement: React.FC = () => {
-  const { collectors, donationBoxes, collections, updateCollectorStatus, registrations, approveRegistration, rejectRegistration } = useNGOStore();
+  const { collectors, donationBoxes, collections, updateCollectorStatus, resetCollectorPassword, registrations, approveRegistration, rejectRegistration } = useNGOStore();
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Disabled'>('All');
@@ -90,6 +91,21 @@ export const CollectorManagement: React.FC = () => {
 
   // View collector stats & audit history detail modal
   const [viewingStaff, setViewingStaff] = useState<Collector | null>(null);
+
+  const handleResetPassword = async (collector: Collector) => {
+    const nextPassword = window.prompt(`Set a new password for ${collector.name} (minimum 6 characters):`);
+    if (!nextPassword) return;
+    if (nextPassword.trim().length < 6) {
+      window.alert('Password must be at least 6 characters.');
+      return;
+    }
+    try {
+      await resetCollectorPassword(collector.id, nextPassword.trim());
+      window.alert(`Password reset successfully for ${collector.name}.`);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to reset password.');
+    }
+  };
 
   const getStaffAssignedBoxes = (collectorId: string) => {
     return donationBoxes.filter((b) => b.collectorId === collectorId);
@@ -287,6 +303,13 @@ export const CollectorManagement: React.FC = () => {
                             title="Edit Profile"
                           >
                             <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleResetPassword(col)}
+                            className="p-1 bg-zinc-50 border border-zinc-150 rounded hover:border-amber-300 hover:bg-amber-100/10 text-amber-700 transition"
+                            title="Reset Collector Password"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => {

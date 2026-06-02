@@ -35,14 +35,15 @@ interface ReportsModuleProps {
 }
 
 export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'report' }) => {
-  const { collections, totalExpenses, commissionRate, expenses, updateExpenseStatus, collectors, donationBoxes } = useNGOStore();
+  const { collections, totalExpenses, commissionRate, expenses, updateExpenseStatus, collectors, donationBoxes, sessionDate } = useNGOStore();
 
   const [activeCompilerTab, setActiveCompilerTab] = useState<'report' | 'ledger'>(defaultTab);
 
   React.useEffect(() => {
     setActiveCompilerTab(defaultTab);
   }, [defaultTab]);
-  const [dateScope, setDateScope] = useState<'All' | 'May2026' | 'June2026'>('All');
+  type DateScope = 'All' | 'previousMonth' | 'currentMonth';
+  const [dateScope, setDateScope] = useState<DateScope>('All');
 
   // Ledger Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,14 +56,21 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
 
   // Report scope collections
   const reportCollections = collections.filter((item) => {
-    if (dateScope === 'May2026') {
-      return item.date.startsWith('2026-05');
+    if (dateScope === 'previousMonth') {
+      return item.date.startsWith(sessionDate.previousMonthKey);
     }
-    if (dateScope === 'June2026') {
-      return item.date.startsWith('2026-06');
+    if (dateScope === 'currentMonth') {
+      return item.date.startsWith(sessionDate.monthKey);
     }
     return true;
   });
+
+  const dateScopeTimelineLabel =
+    dateScope === 'All'
+      ? 'Complete Operations'
+      : dateScope === 'previousMonth'
+        ? sessionDate.previousMonthLabel
+        : sessionDate.monthLabel;
 
   // Calculations for Reports
   const calculatedTotalAmount = reportCollections.reduce((sum, item) => sum + item.amount, 0);
@@ -92,12 +100,15 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
     let matchesDate = true;
     if (dateFilter !== 'All') {
       const itemDate = new Date(item.date);
-      const today = new Date('2026-06-01'); // Sandbox date
+      const today = new Date(sessionDate.iso);
       const diffTime = Math.abs(today.getTime() - itemDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (dateFilter === 'Today') {
-        matchesDate = item.date === '2026-06-01' || item.date === '2026-05-31';
+        const yesterday = new Date(sessionDate.iso);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayIso = yesterday.toISOString().split('T')[0];
+        matchesDate = item.date === sessionDate.iso || item.date === yesterdayIso;
       } else if (dateFilter === 'Last7Days') {
         matchesDate = diffDays <= 7;
       } else if (dateFilter === 'Last30Days') {
@@ -141,9 +152,9 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(55, 65, 81);
-    doc.text(`DOC REF: REP-2026-06-01`, 140, 31);
+    doc.text(`DOC REF: REP-${sessionDate.iso}`, 140, 31);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Audit Date: June 1, 2026`, 140, 36);
+    doc.text(`Audit Date: ${sessionDate.label}`, 140, 36);
     doc.text(`Period Scope: ${dateScope === 'All' ? 'All Operations' : dateScope}`, 140, 41);
 
     doc.setDrawColor(210, 210, 210);
@@ -359,10 +370,10 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
               <div className="grid grid-cols-3 gap-2 mt-4">
                 {(
                   [
-                    { key: 'All', label: 'All Time' },
-                    { key: 'May2026', label: 'May 2026' },
-                    { key: 'June2026', label: 'June 2026' },
-                  ] as const
+                    { key: 'All' as const, label: 'All Time' },
+                    { key: 'previousMonth' as const, label: sessionDate.previousMonthLabel },
+                    { key: 'currentMonth' as const, label: sessionDate.monthLabel },
+                  ]
                 ).map((opt) => (
                   <button
                     key={opt.key}
@@ -466,7 +477,7 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
                   <div className="text-right sm:text-right w-full sm:w-auto mt-2 sm:mt-0 font-mono text-[10px] text-zinc-450 font-medium">
                     <span className="block font-bold text-zinc-800 uppercase tracking-wider text-xs font-sans">Official Audit</span>
                     <span className="block mt-1">Ref ID: AUD-2026-A10</span>
-                    <span>Compiled: June 1, 2026</span>
+                    <span>Compiled: {sessionDate.label}</span>
                   </div>
                 </div>
 
@@ -475,7 +486,7 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
                     Donation Box Collections Reporting Ledger
                   </h2>
                   <span className="inline-block mt-1 font-mono text-[10px] text-zinc-450 font-bold bg-zinc-50 py-0.5 px-2.5 rounded-md border border-zinc-150">
-                    Audit Scope Timeline: {dateScope === 'All' ? 'Complete Operations' : dateScope === 'May2026' ? 'May 1 – May 31, 2026' : 'June 1 – June 30, 2026'}
+                    Audit Scope Timeline: {dateScopeTimelineLabel}
                   </span>
                 </div>
 
@@ -627,7 +638,7 @@ export const ReportsModule: React.FC<ReportsModuleProps> = ({ defaultTab = 'repo
                   className="w-full px-3 py-2 bg-zinc-50 border border-zinc-205 rounded-lg text-xs text-slate-755 font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
                   <option value="All">Entire Ledger History</option>
-                  <option value="Today">Current Daily Cycle (June 1)</option>
+                  <option value="Today">Today ({sessionDate.dayName})</option>
                   <option value="Last7Days">Last 7 Days Yield</option>
                   <option value="Last30Days">Last 30 Days Yield</option>
                 </select>

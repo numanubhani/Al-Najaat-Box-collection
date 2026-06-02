@@ -5,7 +5,7 @@
 
 import { DonationBox, Collector, CollectionRecord, IssueReport, BoxDemand, ExpenseRecord, NotificationItem, UserRegistration, Role } from './types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
 
 // Simple token storage
 const getHeaders = () => {
@@ -133,7 +133,19 @@ export const api = {
       });
       if (!resp.ok) throw new Error('Status update error');
       return resp.json();
-    }
+    },
+    resetPassword: async (id: string, password: string): Promise<{ status: string; message: string }> => {
+      const resp = await fetch(`${API_BASE_URL}/collectors/${id}/reset_password/`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ password }),
+      });
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error || 'Password reset failed');
+      }
+      return resp.json();
+    },
   },
 
   // Collection records

@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNGOStore } from '../store';
 import { DonationBox, IssueReport, BoxDemand, ExpenseRecord } from '../types';
 import { QRCameraScanner } from './QRCameraScanner';
+import CollectorDashboard from './CollectorDashboard';
 import {
   Coins,
   AlertTriangle,
@@ -48,7 +49,8 @@ export const CollectorView: React.FC = () => {
     expenses,
     addExpense,
     logout,
-    userEmail
+    userEmail,
+    sessionDate
   } = useNGOStore();
 
   const currentCollector = collectors.find(
@@ -65,6 +67,8 @@ export const CollectorView: React.FC = () => {
   const mockCollectorName = currentCollector.name;
 
   const [activeView, setActiveView] = useState<'dashboard' | 'scan' | 'issue' | 'demand' | 'history' | 'profile' | 'expense'>('dashboard');
+  const suppressHistoryPushRef = useRef(false);
+  const hasInitializedHistoryRef = useRef(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [dashboardSubTab, setDashboardSubTab] = useState<'pending' | 'all'>('pending');
 
@@ -274,8 +278,7 @@ export const CollectorView: React.FC = () => {
 
   const myCollections = collections.filter(c => c.collectorId === mockCollectorId);
 
-  // Dynamic monthly routing calculations for June 2026
-  const currentMonthPrefix = '2026-06';
+  const currentMonthPrefix = sessionDate.monthKey;
   const myAssignedBoxes = donationBoxes.filter(box => box.collectorId === mockCollectorId);
   const myCollectedThisMonth = collections.filter(c => c.collectorId === mockCollectorId && c.date.startsWith(currentMonthPrefix));
   const myCollectedBoxIdsThisMonth = myCollectedThisMonth.map(c => c.boxId);
@@ -293,12 +296,15 @@ export const CollectorView: React.FC = () => {
       item.donorName.toLowerCase().includes(historySearch.toLowerCase());
 
     const itemDate = new Date(item.date);
-    const today = new Date('2026-06-01'); // matching metadata
+    const today = new Date(sessionDate.iso);
     const diffTime = Math.abs(today.getTime() - itemDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (historyFilter === 'Today') {
-      return matchesSearch && (item.date === '2026-06-01' || item.date === '2026-05-31');
+      const yesterday = new Date(sessionDate.iso);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayIso = yesterday.toISOString().split('T')[0];
+      return matchesSearch && (item.date === sessionDate.iso || item.date === yesterdayIso);
     }
     if (historyFilter === 'Weekly') {
       return matchesSearch && diffDays <= 7;
@@ -343,16 +349,57 @@ export const CollectorView: React.FC = () => {
     return navigationItems.find(item => item.id === activeView)?.label || 'Operations';
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedView = params.get('view') as typeof activeView | null;
+    const allowedViews = new Set(['dashboard', 'scan', 'issue', 'demand', 'history', 'profile', 'expense']);
+    if (requestedView && allowedViews.has(requestedView)) {
+      suppressHistoryPushRef.current = true;
+      setActiveView(requestedView);
+    } else {
+      window.history.replaceState({ collectorView: 'dashboard' }, '', '/collector');
+    }
+
+    const handlePopState = () => {
+      const stateView = (window.history.state?.collectorView as typeof activeView | undefined) || 'dashboard';
+      suppressHistoryPushRef.current = true;
+      setActiveView(stateView);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasInitializedHistoryRef.current) {
+      hasInitializedHistoryRef.current = true;
+      return;
+    }
+    if (suppressHistoryPushRef.current) {
+      suppressHistoryPushRef.current = false;
+      return;
+    }
+
+    if (activeView === 'dashboard') {
+      window.history.pushState({ collectorView: 'dashboard' }, '', '/collector');
+      return;
+    }
+
+    window.history.pushState({ collectorView: activeView }, '', `/collector?view=${activeView}`);
+  }, [activeView]);
+
   return (
-    <div className="flex-grow flex flex-col md:flex-row min-h-screen text-slate-800 dark:text-zinc-100 bg-[#F4F7FA] dark:bg-black transition-colors duration-200">
+    <div className="relative flex-grow w-screen max-w-full min-w-0 overflow-x-hidden flex flex-col md:flex-row min-h-screen text-slate-800 dark:text-zinc-100 bg-[#F4F7FA] dark:bg-black transition-colors duration-200">
       
       {/* BACKGROUND DECORATIONS */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-200/20 dark:bg-sky-950/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-zinc-200/40 dark:bg-slate-900/10 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* MOBILE HEADER TAB BAR OR DRAWER TRIGGER */}
-      <header className="md:hidden sticky top-0 z-40 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 py-3.5 px-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+      <header className="md:hidden sticky top-0 z-40 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 py-3.5 px-4 flex items-center justify-between gap-2 shadow-sm">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-zinc-300 focus:outline-none"
@@ -360,9 +407,9 @@ export const CollectorView: React.FC = () => {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div>
+          <div className="min-w-0">
             <span className="text-[10px] font-mono tracking-widest text-sky-600 dark:text-sky-400 block uppercase font-bold">AL-NAJAAT FIELD</span>
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">{viewHeaderTitle()}</h2>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 truncate">{viewHeaderTitle()}</h2>
           </div>
         </div>
         <div className="flex items-center gap-1.5 bg-sky-50 dark:bg-sky-950/50 py-1 px-2.5 rounded-full border border-sky-100 dark:border-sky-900/20">
@@ -461,14 +508,14 @@ export const CollectorView: React.FC = () => {
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-black flex flex-col gap-1 text-[10px] text-zinc-455 font-mono">
           <div className="flex items-center gap-2 text-slate-500 dark:text-zinc-400">
             <Clock className="w-3.5 h-3.5 shrink-0" />
-            <span>Shift Date: June 1, 2026</span>
+            <span>Shift: {sessionDate.dayName}, {sessionDate.label}</span>
           </div>
           <span className="text-zinc-400 mt-0.5">Django Server Node: Operational</span>
         </div>
       </aside>
 
       {/* MAIN WORKSPACE WRAPPER */}
-      <main className="flex-grow p-4 md:p-8 flex flex-col relative overflow-y-auto max-h-screen">
+      <main className="flex-grow w-full max-w-none p-4 md:p-8 flex flex-col relative overflow-y-auto max-h-screen">
         
         {/* DESKTOP HERO HEADER (Hidden on Mobile) */}
         <div className="hidden md:flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8 border-b border-slate-200 dark:border-slate-800 pb-5">
@@ -503,10 +550,37 @@ export const CollectorView: React.FC = () => {
           </div>
         )}
 
+        {activeView === 'dashboard' && (
+          <CollectorDashboard
+            collectorName={mockCollectorName}
+            collectorId={mockCollectorId}
+            myAssignedBoxes={myAssignedBoxes}
+            pendingUncollectedBoxes={pendingUncollectedBoxes}
+            myCollections={myCollections}
+            totalMyCollectionsSum={totalMyCollectionsSum}
+            totalMyExpensesSum={totalMyExpensesSum}
+            myExpenses={myExpenses}
+            onScan={(box) => {
+              if (box) {
+                setScannedBox(box);
+                setScanStep('form');
+              } else {
+                setScanStep('camera');
+                resetScanFlow();
+              }
+              setActiveView('scan');
+            }}
+            onIssue={() => setActiveView('issue')}
+            onDemand={() => setActiveView('demand')}
+            onExpense={() => setActiveView('expense')}
+            onHistory={() => setActiveView('history')}
+          />
+        )}
+
         {/* ----------------------------------------------------
             VIEW MAIN: DASHBOARD WITH METADATA / DUAL COLUMN
            ---------------------------------------------------- */}
-        {activeView === 'dashboard' && (
+        {false && activeView === 'dashboard' && (
           <div className="space-y-6">
             {/* COMPLIANCE META SUMMARY STRIP */}
             <div className="bg-sky-50 dark:bg-sky-950/20 border border-sky-150 dark:border-sky-900/40 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
@@ -516,7 +590,7 @@ export const CollectorView: React.FC = () => {
                   Active Collector: <strong className="text-slate-900 dark:text-white font-black">{mockCollectorName}</strong> (ID: {mockCollectorId})
                 </span>
                 <span className="text-[9px] bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-305 py-0.5 px-2 rounded font-mono font-bold uppercase border border-sky-200/50">
-                  June 2026 Cycle
+                  {sessionDate.monthLabel} Cycle
                 </span>
               </div>
               <div className="flex items-center gap-4 text-[11px] font-mono whitespace-nowrap">
@@ -613,7 +687,7 @@ export const CollectorView: React.FC = () => {
                         Shift Collection Progress
                       </span>
                       <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
-                        June 2026 target frequency rota
+                        {sessionDate.monthLabel} target frequency rota
                       </span>
                     </div>
                   </div>

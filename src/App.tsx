@@ -15,14 +15,22 @@ import ReportsModule from './components/ReportsModule';
 import RegulatoryList from './components/RegulatoryList';
 import CollectorView from './components/CollectorView';
 import PWAPrompt from './components/PWAPrompt';
+import ToastViewport from './components/ToastViewport';
 import { Bell, LogOut, Menu, X, UserCheck, LayoutDashboard, Box, History, ClipboardList, Sun, Moon } from 'lucide-react';
 
 function AdminLayout() {
-  const { logout, notifications, markNotificationRead, markAllNotificationsRead, theme, toggleTheme } = useNGOStore();
+  const { logout, notifications, markNotificationRead, markAllNotificationsRead, theme, toggleTheme, userName, userEmail } = useNGOStore();
   const location = useLocation();
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const unreadNotifs = notifications.filter((n) => !n.read);
+  const initials = (userName || 'U')
+    .split(' ')
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   const navItems = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -67,10 +75,10 @@ function AdminLayout() {
           </div>
           <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#111622] flex items-center justify-between text-xs text-slate-500 dark:text-zinc-450">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 font-semibold text-slate-700 dark:text-zinc-200 flex items-center justify-center text-[10px] font-mono border border-slate-300/40 dark:border-slate-700/60">AD</div>
+              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 font-semibold text-slate-700 dark:text-zinc-200 flex items-center justify-center text-[10px] font-mono border border-slate-300/40 dark:border-slate-700/60">{initials}</div>
               <div>
-                <span className="block text-slate-800 dark:text-zinc-100 font-bold text-xs leading-none">Amna Khan</span>
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-mono block mt-0.5">head@ecogrowth.org</span>
+                <span className="block text-slate-800 dark:text-zinc-100 font-bold text-xs leading-none">{userName}</span>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-mono block mt-0.5">{userEmail}</span>
               </div>
             </div>
             <button onClick={logout} className="p-1 px-2 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 dark:text-zinc-450 hover:text-rose-600 dark:hover:text-rose-500 rounded-md transition cursor-pointer" title="Sign Out Session">
@@ -162,7 +170,19 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={isLoggedIn ? <Navigate to={role === 'Collector' ? '/collector' : '/admin/dashboard'} replace /> : <LoginPage />} />
-      <Route path="/collector" element={isLoggedIn && role === 'Collector' ? <><CollectorView /><PWAPrompt /></> : <Navigate to="/login" replace />} />
+      <Route
+        path="/collector"
+        element={
+          isLoggedIn && role === 'Collector' ? (
+            <div className="min-h-screen w-full overflow-x-hidden">
+              <CollectorView />
+              <PWAPrompt />
+            </div>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
       <Route path="/*" element={<NGOAppContent />} />
     </Routes>
   );
@@ -172,6 +192,7 @@ export default function App() {
   return (
     <NGOStoreProvider>
       <AppRoutes />
+      <ToastViewport />
     </NGOStoreProvider>
   );
 }
