@@ -47,12 +47,22 @@ export const CollectorView: React.FC = () => {
     collectors,
     expenses,
     addExpense,
-    logout
+    logout,
+    userEmail
   } = useNGOStore();
 
-  // Current Logger defaults to COL-001 (John Smith) for high fidelity simulation
-  const mockCollectorId = 'COL-001';
-  const mockCollectorName = 'John Smith';
+  const currentCollector = collectors.find(
+    (c) => c.email.toLowerCase() === userEmail.toLowerCase()
+  ) || {
+    id: 'COL-001',
+    name: 'John Smith',
+    phone: '',
+    email: 'john.smith@helperngo.org',
+    status: 'Active' as const
+  };
+
+  const mockCollectorId = currentCollector.id;
+  const mockCollectorName = currentCollector.name;
 
   const [activeView, setActiveView] = useState<'dashboard' | 'scan' | 'issue' | 'demand' | 'history' | 'profile' | 'expense'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
