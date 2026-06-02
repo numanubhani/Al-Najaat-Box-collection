@@ -125,10 +125,10 @@ export const LoginPage: React.FC = () => {
             <Heart className="w-6 h-6 fill-white" />
           </div>
           <h2 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 font-sans">
-            EcoGrowth Foundation
+            Al-Najaat Foundation
           </h2>
           <p className="mt-1 text-xs text-slate-400 dark:text-zinc-450 font-semibold tracking-wider uppercase font-mono">
-            Smart Donation Box Ledger
+            Social Care Foundation Ledger
           </p>
         </div>
 
@@ -143,7 +143,7 @@ export const LoginPage: React.FC = () => {
             }}
             className={`py-2 text-xs font-bold rounded-md transition-all cursor-pointer ${
               activeTab === 'login'
-                ? 'bg-white dark:bg-[#0F172A] text-sky-700 dark:text-sky-450 shadow-xs border border-slate-200/50 dark:border-slate-800'
+                ? 'bg-white dark:bg-[#0F172A] text-sky-700 dark:text-sky-455 shadow-xs border border-slate-200/50 dark:border-slate-800'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-zinc-200'
             }`}
           >
@@ -158,7 +158,7 @@ export const LoginPage: React.FC = () => {
             }}
             className={`py-2 text-xs font-bold rounded-md transition-all cursor-pointer ${
               activeTab === 'register'
-                ? 'bg-white dark:bg-[#0F172A] text-sky-700 dark:text-sky-450 shadow-xs border border-slate-200/50 dark:border-slate-800'
+                ? 'bg-white dark:bg-[#0F172A] text-sky-700 dark:text-sky-455 shadow-xs border border-slate-200/50 dark:border-slate-800'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-850 dark:hover:text-zinc-200'
             }`}
           >
@@ -182,39 +182,6 @@ export const LoginPage: React.FC = () => {
         {/* Form view 1: Login Tab */}
         {activeTab === 'login' ? (
           <div>
-            {/* Quick prefill selectors */}
-            <div className="mb-4">
-              <span className="block text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono font-bold mb-2">
-                Simulate Direct Roles
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect('Admin')}
-                  className={`flex items-center justify-center gap-1.5 py-2 px-3 border rounded-lg text-[11px] font-semibold transition cursor-pointer ${
-                    selectedRole === 'Admin'
-                      ? 'border-sky-500 bg-sky-500/5 text-sky-700 dark:text-sky-450 font-bold'
-                      : 'border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-[#1E293B]/40 text-slate-500 dark:text-zinc-450 hover:bg-slate-100'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Admin Prefill
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect('Collector')}
-                  className={`flex items-center justify-center gap-1.5 py-2 px-3 border rounded-lg text-[11px] font-semibold transition cursor-pointer ${
-                    selectedRole === 'Collector'
-                      ? 'border-sky-500 bg-sky-500/5 text-sky-700 dark:text-sky-450 font-bold'
-                      : 'border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-[#1E293B]/40 text-slate-500 dark:text-zinc-450 hover:bg-slate-100'
-                  }`}
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  Collector Prefill
-                </button>
-              </div>
-            </div>
-
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1" htmlFor="email">
@@ -283,6 +250,33 @@ export const LoginPage: React.FC = () => {
                 )}
               </button>
             </form>
+
+            {/* Subtle Simulation Prefills Helper */}
+            <div className="mt-5.5 pt-4.5 border-t border-slate-100 dark:border-slate-800/80 text-center text-[10.5px] text-zinc-400 font-medium">
+              <span className="block mb-2 font-mono text-[9px] tracking-widest uppercase font-bold text-zinc-500">Demo Account Credentials</span>
+              <div className="flex gap-2 justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('Admin@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 border border-slate-200/50 dark:border-slate-800 rounded-lg px-3 py-1.5 transition text-sky-700 dark:text-sky-400 hover:font-bold cursor-pointer font-bold block"
+                >
+                  Prefill Admin
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('naib@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 border border-slate-200/50 dark:border-slate-800 rounded-lg px-3 py-1.5 transition text-sky-700 dark:text-sky-400 hover:font-bold cursor-pointer font-bold block"
+                >
+                  Prefill Collector
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           /* Form view 2: Register Tab */

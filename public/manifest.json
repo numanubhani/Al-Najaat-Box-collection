@@ -1,0 +1,24 @@
+{
+  "short_name": "Al-Najaat",
+  "name": "Al-Najaat Social Care Ledger",
+  "description": "Smart Donation Box Ledger and Asset Management App for Al-Najaat Foundation",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=192&h=192&fit=crop&q=80",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=512&h=512&fit=crop&q=80",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#064e2b",
+  "theme_color": "#0ea5e9",
+  "display": "standalone",
+  "orientation": "portrait"
+}

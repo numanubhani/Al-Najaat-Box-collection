@@ -33,7 +33,8 @@ import {
   Menu,
   ShieldCheck,
   Map,
-  DollarSign
+  DollarSign,
+  LogOut
 } from 'lucide-react';
 
 export const CollectorView: React.FC = () => {
@@ -45,7 +46,8 @@ export const CollectorView: React.FC = () => {
     collections,
     collectors,
     expenses,
-    addExpense
+    addExpense,
+    logout
   } = useNGOStore();
 
   // Current Logger defaults to COL-001 (John Smith) for high fidelity simulation
@@ -349,7 +351,7 @@ export const CollectorView: React.FC = () => {
             <Menu className="w-5 h-5" />
           </button>
           <div>
-            <span className="text-[10px] font-mono tracking-widest text-sky-600 dark:text-sky-400 block uppercase font-bold">ECOGROWTH FIELD</span>
+            <span className="text-[10px] font-mono tracking-widest text-sky-600 dark:text-sky-400 block uppercase font-bold">AL-NAJAAT FIELD</span>
             <h2 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">{viewHeaderTitle()}</h2>
           </div>
         </div>
@@ -380,7 +382,7 @@ export const CollectorView: React.FC = () => {
                 <Coins className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-black text-slate-850 dark:text-zinc-100 tracking-tight leading-none">EcoGrowth Field</h3>
+                <h3 className="text-sm font-black text-slate-850 dark:text-zinc-100 tracking-tight leading-none">Al-Najaat Field</h3>
                 <span className="text-[10px] font-mono tracking-widest text-sky-600 dark:text-sky-400 font-bold mt-1.5 block uppercase">Collector Node</span>
               </div>
             </div>
@@ -431,6 +433,18 @@ export const CollectorView: React.FC = () => {
               );
             })}
           </nav>
+
+          {/* Sign Out Button */}
+          <div className="p-4 border-t border-slate-100 dark:border-slate-900 bg-white dark:bg-black">
+            <button
+              onClick={() => logout()}
+              type="button"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-rose-50 hover:bg-rose-100/90 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-650 dark:text-rose-400 rounded-xl text-xs font-black transition cursor-pointer border border-rose-201/50 dark:border-rose-900/35"
+            >
+              <LogOut className="w-4 h-4 text-rose-500" />
+              Sign Out Session
+            </button>
+          </div>
         </div>
 
         {/* Footer Audit Details */}

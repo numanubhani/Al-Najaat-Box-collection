@@ -12,9 +12,9 @@ import QRManager from './components/QRManager';
 import CollectorManagement from './components/CollectorManagement';
 import CollectionRecords from './components/CollectionRecords';
 import ReportsModule from './components/ReportsModule';
-import CustomerList from './components/CustomerList';
 import RegulatoryList from './components/RegulatoryList';
 import CollectorView from './components/CollectorView';
+import PWAPrompt from './components/PWAPrompt';
 import {
   Bell,
   LogOut,
@@ -70,51 +70,6 @@ function NGOAppContent() {
         ? 'dark bg-black text-white' 
         : 'bg-[#F8FAFC] text-slate-900'
     }`}>
-      {/* 1. Evaluation Role Switching Banner at Very Top */}
-      <div className="bg-sky-950 text-sky-100 text-[11px] py-2 px-4 border-b border-sky-900 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-sm select-none relative z-50">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400 animate-spin-once shrink-0" />
-          <span>
-             NGO Evaluator Sandbox: Click tabs in this top banner to instantly swap view roles in real-time.
-          </span>
-         </div>
-        <div className="flex items-center gap-1.5 bg-sky-905 border border-sky-900 p-0.5 rounded-lg shrink-0">
-          {/* Quick theme toggler under evaluation banner */}
-          <button
-            onClick={toggleTheme}
-            className="p-1 px-2 text-sky-300 hover:text-white transition flex items-center gap-1 cursor-pointer"
-            title="Toggle Light / Dark Mode"
-          >
-            {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-sky-300" />}
-            <span className="text-[10px] font-semibold">{theme === 'dark' ? 'Light' : 'Dark'}</span>
-          </button>
-          
-          <div className="w-[1px] h-3.5 bg-sky-800/80 self-center"></div>
-
-          <button
-            onClick={() => setRole('Admin')}
-            className={`px-3 py-1 font-semibold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-              role === 'Admin'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-sky-400 hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Admin Views
-          </button>
-          <button
-            onClick={() => setRole('Collector')}
-            className={`px-3 py-1 font-semibold rounded-md transition flex items-center gap-1.5 cursor-pointer ${
-              role === 'Collector'
-                ? 'bg-sky-600 text-white shadow-sm'
-                : 'text-sky-400 hover:text-white'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            Field Collector View
-          </button>
-        </div>
-      </div>
 
       {/* RENDER VIEW: COLLECTOR PORTAL DASHBOARD */}
       {role === 'Collector' ? (
@@ -146,8 +101,8 @@ function NGOAppContent() {
                     <Box className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-md font-bold text-slate-800 dark:text-zinc-100 tracking-tight leading-none font-sans">EcoGrowth</h3>
-                    <span className="text-[10px] font-mono tracking-wider text-sky-600 dark:text-sky-400 font-semibold mt-1 block uppercase">System node</span>
+                    <h3 className="text-md font-bold text-slate-800 dark:text-zinc-100 tracking-tight leading-none font-sans">Al-Najaat</h3>
+                    <span className="text-[10px] font-mono tracking-wider text-sky-600 dark:text-sky-400 font-semibold mt-1 block uppercase font-bold">Social Care Foundation</span>
                   </div>
                 </div>
                 {/* Mobile Menu Close Icon */}
@@ -165,11 +120,9 @@ function NGOAppContent() {
                 {(
                   [
                     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                    { id: 'boxes', label: 'Donation Boxes Status', icon: Box },
-                    { id: 'customers', label: 'Customer List', icon: Users },
+                    { id: 'boxes', label: 'Add Donor', icon: Box },
                     { id: 'collectors', label: 'Collector', icon: UserCheck },
-                    { id: 'records', label: 'Ledger', icon: History },
-                    { id: 'reports', label: 'Report', icon: FileCheck },
+                    { id: 'records', label: 'Report and ledger', icon: History },
                     { id: 'compliance', label: 'Complain and new box issue', icon: ClipboardList },
                   ] as const
                 ).map((tab) => {
@@ -345,16 +298,15 @@ function NGOAppContent() {
             <main className="p-6 md:p-8 flex-grow overflow-y-auto max-h-[calc(100vh-140px)]">
               {activeAdminTab === 'dashboard' && <AdminDashboard />}
               {activeAdminTab === 'boxes' && <BoxManagement />}
-              {activeAdminTab === 'customers' && <CustomerList />}
               {activeAdminTab === 'collectors' && <CollectorManagement />}
               {activeAdminTab === 'records' && <ReportsModule defaultTab="ledger" />}
-              {activeAdminTab === 'reports' && <ReportsModule defaultTab="report" />}
               {activeAdminTab === 'compliance' && <RegulatoryList />}
             </main>
 
           </div>
         </div>
       )}
+      <PWAPrompt />
     </div>
   );
 }
